@@ -27,7 +27,6 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
-      <module name="Numerical Methods" target="1.8" />
       <module name="Numerical_Methods" target="1.8" />
     </bytecodeTargetLevel>
   </component>

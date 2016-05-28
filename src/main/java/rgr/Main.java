@@ -1,7 +1,6 @@
 package rgr;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -219,7 +218,7 @@ public class Main {
 
     private static void getEV() {
         if (matrixMap.containsKey(splitCommand[1])) {
-            double[] ev = matrixMap.get(splitCommand[1]).getEigenVector();
+            double[] ev = matrixMap.get(splitCommand[1]).eiv();
             for (int i = 0; i < ev.length; i++) {
                 System.out.println(ev[i]);
             }

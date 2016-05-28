@@ -2,6 +2,7 @@ package rgr;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.*;
@@ -91,9 +92,9 @@ public class Matrix {
                 for (int k  = 0; k < currentRow.length; k++)
                     sum += currentRow[k] * currentColumn[k];
                 //exclude -0.0000
-                if (Math.abs(sum) <= 1E-12)
-                    result.set(i, j, 0);
-                else
+//                if (Math.abs(sum) <= 1E-12)
+//                    result.set(i, j, 0);
+//                else
                     result.set(i, j, sum);
             }
         }
@@ -188,6 +189,13 @@ public class Matrix {
         }
     }
 
+    public void print(PrintWriter out) {
+        for (int i = 0; i < this.N; i++) {
+            printRow(i);
+            out.println();
+        }
+    }
+
     private void printRow(int rowNumber) {
 
         DecimalFormat format = new DecimalFormat();
@@ -224,15 +232,25 @@ public class Matrix {
         return ans;
     }
 
-    public double[] getEigenVector() {
+    public double[] eiv() {
         double[] result = new double[N];
 
         Matrix R = QR.householder(this).getR();
         for (int i = 0; i < R.getM(); i++) {
-            result[i] = R.get(i, i);
+            result[i] = R.get(i, i) * (-1);
         }
 
         return result;
+    }
+
+    public Matrix copy() {
+        double[][] res = new double[this.getN()][this.getM()];
+        for (int i = 0; i < this.getN(); i++) {
+            for (int j = 0; j < this.getM(); j++) {
+                res[i][j] = A[i][j];
+            }
+        }
+        return new Matrix(res, this.getN(), this.getM());
     }
 
     public static void main(String args[]) {
@@ -260,6 +278,6 @@ public class Matrix {
         d.print();
 
 //        Matrix a = new Matrix(arrayForA);
-//        System.out.println(a.getEigenVector());
+//        System.out.println(a.eiv());
     }
 }

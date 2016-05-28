@@ -22,72 +22,101 @@ public class QR {
 
         int n = A.getN();
         Matrix Q = null;
+        Matrix R = null;
         Matrix P;
         Matrix W, transposeW;
         IdentityMatrix E = new IdentityMatrix(A.getN());
-        for (int i = 0; i < A.getM(); i++) {
-            //calculate s
-            double[] curColumn = A.getColumn(i);
-            double s = 0;
-            for (int j = i; j < n; j++) {
-                s += curColumn[j] * curColumn[j];
-            }
-            s = Math.sqrt(s);
-            //get converse sign of diagonal element
-            if (A.get(i, i) != 0) {
-                s *= Math.signum(A.get(i, i)) * -1.;
-            }
 
-            //calculate u
-            double u = 1. / Math.sqrt(2. * s * (s - A.get(i, i)));
-
-            //calculate W
-            W = new Matrix(n, 1);
-            for (int j = 0; j < n; j++) {
-                if (j < i)
-                    W.set(j, 0, 0);
-                else
-                    if (i == j)
-                        W.set(j, 0, u * (A.get(j, i) - s));
-                    else
-                        W.set(j, 0, u * A.get(j, i));
-            }
-
-            transposeW = W.transpose();
-
-            try {
-                //calculate P = (E - 2 * Wi * transWi)
-                P = E.subtract(W.multiply(2.).multiply(transposeW));
-
-                //calculate next A
-                A = P.multiply(A);
-
-                //Q = Pk * Pk-1 * ... * P1
-                if (Q == null) {
-                    Q = P;
-                } else {
-                    Q = Q.multiply(P);
+        int numberOfIterations = 1000;
+        for (int k = 0; k < numberOfIterations; k++) {
+            R = A.copy();
+            Q = null;
+            for (int i = 0; i < R.getM(); i++) {
+                //calculate s
+                double[] curColumn = R.getColumn(i);
+                double s = 0;
+                for (int j = i; j < n; j++) {
+                    s += curColumn[j] * curColumn[j];
+                }
+                s = Math.sqrt(s);
+                //get converse sign of diagonal element
+                if (R.get(i, i) != 0) {
+                    s *= Math.signum(R.get(i, i)) * -1.;
                 }
 
-                System.out.println("A matrix" + i);
-                A.print();
-                System.out.println("Q matrix" + i);
-                Q.print();
-                System.out.println("P matrix" + i);
-                P.print();
-                System.out.println("s " + s + " u" + u);
-                System.out.println();
+                //calculate u
+                double u = 1. / Math.sqrt(2. * s * (s - R.get(i, i)));
 
-            } catch (MatrixException e) {
-                e.printStackTrace();
+                //calculate W
+                W = new Matrix(n, 1);
+                for (int j = 0; j < n; j++) {
+                    if (j < i)
+                        W.set(j, 0, 0);
+                    else if (i == j)
+                        W.set(j, 0, u * (R.get(j, i) - s));
+                    else
+                        W.set(j, 0, u * R.get(j, i));
+                }
+
+                transposeW = W.transpose();
+
+                try {
+                    //calculate P = (E - 2 * Wi * transWi)
+                    P = E.subtract(W.multiply(2.).multiply(transposeW));
+
+                    //calculate next A
+                    R = P.multiply(R);
+
+                    //Q = Pk * Pk-1 * ... * P1
+                    if (Q == null) {
+                        Q = P;
+                    } else {
+                        Q = Q.multiply(P);
+                    }
+
+//                System.out.println("A matrix" + i);
+//                A.print();
+//                System.out.println("Q matrix" + i);
+//                Q.print();
+//                System.out.println("P matrix" + i);
+//                P.print();
+//                System.out.println("s " + s + " u" + u);
+//                System.out.println();
+
+                } catch (MatrixException e) {
+                    e.printStackTrace();
+                }
+
+                //check for upper triangular matrix
+//                if (A.isUpperTriangular())
+//                    break;
             }
 
-            //check for upper triangular matrix
-            if (A.isUpperTriangular())
+
+            //check low triangular matrix of Q
+            boolean good = true;
+            for (int i = 0; i < Q.getN(); i++) {
+                for (int j = 0; j < i; j++) {
+                    if (Math.abs(Q.get(i,j)) > 1E-3) {
+                        good = false;
+                        break;
+                    }
+                }
+            }
+
+            if (!good) {
+                try {
+                    A = R.multiply(Q);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("number of iterations " + k);
                 break;
+            }
         }
 
-        return new QRDecomposition(Q, A);
+        return new QRDecomposition(Q, R);
     }
 
     public static QRDecomposition givensRotation(Matrix A) {
@@ -156,12 +185,13 @@ public class QR {
 
     public static void main(String args[]){
         List<List<Double>> arrayForM = new ArrayList<>();
-        arrayForM.add(Arrays.asList(2., 1., 4., 1.));
-        arrayForM.add(Arrays.asList(3., 3., 2., -2.));
-        arrayForM.add(Arrays.asList(4., 2., -1., 3.));
+        arrayForM.add(Arrays.asList(2., 0., 0., 0.));
+        arrayForM.add(Arrays.asList(3., 3., 0., 0.));
+        arrayForM.add(Arrays.asList(4., 2., -1., 0.));
         arrayForM.add(Arrays.asList(5., -1., 4., 2.));
 
-//        List<List<Double>> arrayForM = new ArrayList<>();
+//        List<List<Double>> arrayForM = new ArrayList<>();if (A.isUpperTriangular())
+//                    break;
 //        arrayForM.add(Arrays.asList(12., -51., 4.));
 //        arrayForM.add(Arrays.asList(6., 167., -68.));
 //        arrayForM.add(Arrays.asList(-4., 24., -41.));
@@ -180,7 +210,15 @@ public class QR {
 //        arrayForM.add(Arrays.asList(0.9134, 0.9575, 0.4854));
 //        arrayForM.add(Arrays.asList(0.6324, 0.9649, 0.8003));
 //
-        Matrix M = new Matrix(arrayForM);
+
+        String path = "/home/vlad/IdeaProjects/Numerical_Methods/src/main/java/matrices/sparse_10_10_Stranke94.txt";
+//        Matrix M = new Matrix(arrayForM);
+        Matrix M = null;
+        try {
+            M = new Matrix(path);
+        } catch (MatrixException e) {
+            e.printStackTrace();
+        }
 
         System.out.println("householder");
         QRDecomposition result = QR.householder(M);
@@ -200,7 +238,7 @@ public class QR {
 //        System.out.println("givens");
 //        res.print();
 
-//        List<Double> ev = M.getEigenVector();
+//        List<Double> ev = M.eiv();
 //        List<List<Double>> l = new ArrayList<>();
 //        for (Double d : ev) {
 //            List<Double> t = new ArrayList<>();
@@ -217,7 +255,7 @@ public class QR {
 //        try {
 //            Matrix m = new Matrix("/home/vlad/IdeaProjects/Numerical_Methods/src/main/java/matrices/sparse_100_100.txt");
 //            long s = System.currentTimeMillis();
-//            double[] t = m.getEigenVector();
+//            double[] t = m.eiv();
 //            System.out.println("time " + (System.currentTimeMillis() - s));
 ////            for (int i = 0; i < t.length; i++) {
 ////                System.out.println(t[i]);
