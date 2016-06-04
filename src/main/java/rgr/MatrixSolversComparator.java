@@ -15,8 +15,8 @@ public class MatrixSolversComparator {
     public  static void main(String args[]) {
 //        String path = "/home/vlad/IdeaProjects/Numerical_Methods/src/main/java/matrices/sparse_5_ 5_cage3.txt";
 //        String path = "/home/vlad/IdeaProjects/Numerical_Methods/src/main/java/matrices/sparce_7_7_b1_ss.txt";
-        String path = "/home/vlad/IdeaProjects/Numerical_Methods/src/main/java/matrices/sparse_10_10_Stranke94.txt";
-//        String path = "/home/vlad/IdeaProjects/Numerical_Methods/src/main/java/matrices/sparse_27_27_ex5.txt";
+//        String path = "/home/vlad/IdeaProjects/Numerical_Methods/src/main/java/matrices/sparse_10_10_Stranke94.txt";
+        String path = "/home/vlad/IdeaProjects/Numerical_Methods/src/main/java/matrices/sparse_27_27_ex5.txt";
 //        String path = "/home/vlad/IdeaProjects/Numerical_Methods/src/main/java/matrices/sparse_100_100.txt";
 //        String path = "/home/vlad/IdeaProjects/Numerical_Methods/src/main/java/matrices/sparse_105_105.txt";
 //        String path = "/home/vlad/IdeaProjects/Numerical_Methods/src/main/java/matrices/sparse_135_135.txt";
@@ -47,7 +47,7 @@ public class MatrixSolversComparator {
             EigenvalueDecomposition evd = new EigenvalueDecomposition(jamaM);
             double[] ev = evd.getRealEigenvalues();
             long finishJama = System.currentTimeMillis() - startJama;
-            out.println("jama finish in " + finishJama + "ms");
+            out.println("jama time: " + finishJama + "ms");
 //            for (int i = 0; i < n; i++) {
 //                out.println(ev[i]);
 //            }
@@ -55,7 +55,7 @@ public class MatrixSolversComparator {
             long startRGR = System.currentTimeMillis();
             double[] evm = rgrM.eiv();
             long finishRGR = System.currentTimeMillis() - startRGR;
-            out.println("rgr finish in " + finishRGR + "ms");
+            out.println("rgr time: " + finishRGR + "ms");
 
 
             Arrays.sort(ev);
@@ -71,6 +71,7 @@ public class MatrixSolversComparator {
             format.setGroupingUsed(false);
 
             String s;
+            System.out.println("\t jama \t\trgr \t\td");
             for (int i = 0; i < evm.length; i++) {
                 s = format.format(ev[i]);
                 int padding = Math.max(1, 15 - s.length()); // At _least_ 1 space

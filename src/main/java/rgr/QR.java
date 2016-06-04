@@ -211,14 +211,8 @@ public class QR {
 //        arrayForM.add(Arrays.asList(0.6324, 0.9649, 0.8003));
 //
 
-        String path = "/home/vlad/IdeaProjects/Numerical_Methods/src/main/java/matrices/sparse_10_10_Stranke94.txt";
-//        Matrix M = new Matrix(arrayForM);
-        Matrix M = null;
-        try {
-            M = new Matrix(path);
-        } catch (MatrixException e) {
-            e.printStackTrace();
-        }
+//        String path = "/home/vlad/IdeaProjects/Numerical_Methods/src/main/java/matrices/sparse_10_10_Stranke94.txt";
+        Matrix M = new Matrix(arrayForM);
 
         System.out.println("householder");
         QRDecomposition result = QR.householder(M);
